@@ -1,0 +1,13 @@
+﻿# API Keys and Secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+
+# Screenshots and data
+screenshots/
+trading_notes/
+api_tracker.json
+token_usage.json
+vocabulary_training.json
