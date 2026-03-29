@@ -1,14 +1,17 @@
-Python 3.13.3 PS D:\MyPythonProjects_2\TRADING JOURNAL WITH VOICE>  voice_to_notion.py       
-voice_to_notion.py : The term 'voice_to_notion.py' is not recognized as the name of a 
-cmdlet, function, script file, or operable program. Check the spelling of the name, or if a   
-path was included, verify that the path is correct and try again.
-At line:1 char:1
-+ voice_to_notion.py
-+ ~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : ObjectNotFound: (voice_to_notion.py:String) [], CommandNotFoun  
-   dException
-    + FullyQualifiedErrorId : CommandNotFoundException
- 
 
-Suggestion [3,General]: The command voice_to_notion.py was not found, but does exist in the current location. Windows PowerShell does not load commands from the current location by default. If you trust this command, instead type: ".\voice_to_notion.py". See "get-help about_Command_Precedence" for more details.
- Python 3.13.3 PS D:\MyPythonProjects_2\TRADING JOURNAL WITH VOICE>  
+========================================
+  Trading Journal Pro
+========================================
+
+Starting application...
+
+Vocabulary training file loaded.
+DEBUG: Upload method selected: cloudinary
+DEBUG: Screenshots to upload: ['entry']
+DEBUG add_screenshots_as_blocks: upload_method='cloudinary', screenshots=['entry']
+DEBUG: Attempting Cloudinary upload for Entry
+DEBUG: Cloud name: dqrwqr6y2, API key exists: True, Secret exists: True
+DEBUG: Uploading ./screenshots\Trade_20260329_172050_entry_172050.png to Cloudinary...
+DEBUG: Upload result: https://res.cloudinary.com/dqrwqr6y2/image/upload/q_100/v1774801256/eldqwrzsfutv3j38oyjo.jpg
+Added 1 screenshots to Notion (method: cloudinary)
+Added 1 Cloudinary links to Screenshots column

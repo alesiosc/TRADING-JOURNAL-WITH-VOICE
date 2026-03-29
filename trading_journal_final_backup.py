@@ -1,9 +1,8 @@
 ﻿import tkinter as tk
-from tkinter import scrolledtext, ttk, messagebox, filedialog
+from tkinter import scrolledtext, ttk, messagebox
 import threading
 import json
 import os
-import csv
 from dotenv import load_dotenv
 from datetime import datetime
 from groq import Groq
@@ -29,26 +28,21 @@ SYSTEM_PROMPT = """You are a trading journal parser. Extract structured data fro
 FIELD MAPPINGS:
 - M5_Pattern: Hammer, Shooting Star, Bullish Engulfing, Bearish Engulfing (can be multiple)
 - M1_Confirm: Yes, No
-- Five_M_Form: Perfect, Well-Formed, Decent, Questionable, Poor
+- M5_Form: Perfect, Well-Formed, Decent, Questionable, Poor
 - Entry_Direction: Buy, Sell
 - Emotions: Zen, Anxious, FOMO, Revenge
 - Impulse: 1-10 (number)
-- Patience_Score: 1-10 (number, 1-3=strong patience, 7-10=weak patience/impatient)
+- Patience_Score: 1-10 (number, 1-3=strong, 7-10=weak)
 
-NATURAL LANGUAGE RECOGNITION:
-- "5 minute form", "5m form", "five minute form", "candle form", "pattern form" → Five_M_Form
-- "perfect", "well formed", "decent", "questionable", "poor" → Five_M_Form values
-- "FOMO" can be misheard as "foam", "foam wall", "formal" - always interpret as FOMO emotion
-- "one" or "1" after "patience" = Patience_Score: 1
+SPECIAL LOGIC:
 - "engulfing" without bullish/bearish → check Entry_Direction to determine
 - Numbers need context: "impulse 7" vs "patience 4"
-- When user says they were patient or "give myself a one/two/three" = low Patience_Score (1-3 = strong patience)
 
 Return JSON only with fields found:
 {
   "M5_Pattern": ["Hammer", "Shooting Star", "Bullish Engulfing", "Bearish Engulfing"],
   "M1_Confirm": "Yes|No",
-  "Five_M_Form": "Perfect|Well-Formed|Decent|Questionable|Poor",
+  "M5_Form": "Perfect|Well-Formed|Decent|Questionable|Poor",
   "Entry_Direction": "Buy|Sell",
   "Emotions": "Zen|Anxious|FOMO|Revenge",
   "Impulse": 1-10,
@@ -58,7 +52,7 @@ Return JSON only with fields found:
 
 class ScreenshotManager:
     def __init__(self):
-        self.screenshot_folder = r"D:\MyPythonProjects_2\TRADING JOURNAL WITH VOICE\screenshots"
+        self.screenshot_folder = "./screenshots"
         os.makedirs(self.screenshot_folder, exist_ok=True)
         self.sct = mss.mss()
         self.current_trade_id = None
@@ -80,29 +74,17 @@ class ScreenshotManager:
         
         timestamp = datetime.now().strftime("%H%M%S")
         
-        # Get the monitor to capture
-        monitor = self.sct.monitors[monitor_num]
-        screenshot = self.sct.grab(monitor)
+        if monitor_num == 0:
+            screenshot = self.sct.grab(self.sct.monitors[0])
+        else:
+            screenshot = self.sct.grab(self.sct.monitors[monitor_num])
         
         img = Image.frombytes("RGB", screenshot.size, screenshot.bgra, "raw", "BGRX")
         
         # Apply crop if enabled and region defined
         if use_crop and monitor_num in self.crop_regions:
             x1, y1, x2, y2 = self.crop_regions[monitor_num]
-            
-            # Convert absolute screen coordinates to monitor-relative coordinates
-            crop_x1 = x1 - monitor["left"]
-            crop_y1 = y1 - monitor["top"]
-            crop_x2 = x2 - monitor["left"]
-            crop_y2 = y2 - monitor["top"]
-            
-            # Ensure coordinates are within bounds
-            crop_x1 = max(0, crop_x1)
-            crop_y1 = max(0, crop_y1)
-            crop_x2 = min(monitor["width"], crop_x2)
-            crop_y2 = min(monitor["height"], crop_y2)
-            
-            img = img.crop((crop_x1, crop_y1, crop_x2, crop_y2))
+            img = img.crop((x1, y1, x2, y2))
         
         filename = f"Trade_{self.current_trade_id}_{stage}_{timestamp}.png"
         filepath = os.path.join(self.screenshot_folder, filename)
@@ -126,10 +108,7 @@ class TradingJournalFinal:
         self.screenshot_mgr = ScreenshotManager()
         self.selected_monitor = tk.IntVar(value=0)
         self.crop_mode = tk.BooleanVar(value=False)
-        # Map numeric values to method names
-        upload_map = {"1": "local", "2": "cloudinary", "3": "notion_blocks"}
-        upload_value = os.getenv("SCREENSHOT_UPLOAD_METHOD", "1")
-        self.upload_method = tk.StringVar(value=upload_map.get(upload_value, "local"))
+        self.upload_method = tk.StringVar(value=os.getenv("SCREENSHOT_UPLOAD_METHOD", "local"))
         self.checklist_items = {}
         
         # Main container
@@ -206,51 +185,14 @@ class TradingJournalFinal:
             label = "All" if i == 0 else str(i)
             tk.Radiobutton(control_frame, text=label, variable=self.selected_monitor, value=i, font=("Arial", 9)).grid(row=0, column=i+1, padx=2)
         
-        # Define Crop button (auto-crops if region exists)
-        tk.Button(control_frame, text="Define Crop", command=self.define_crop_region, font=("Arial", 9, "bold"), bg="#000000", fg="white", padx=10).grid(row=0, column=6, padx=10)
-        
-        # Clear Crop button
-        tk.Button(control_frame, text="Clear Crop", command=self.clear_crop_region, font=("Arial", 8), bg="#666666", fg="white").grid(row=0, column=7, padx=5)
+        # Crop mode toggle
+        tk.Checkbutton(control_frame, text="Crop Chart Only", variable=self.crop_mode, font=("Arial", 9)).grid(row=0, column=6, padx=10)
+        tk.Button(control_frame, text="Define Crop", command=self.define_crop_region, font=("Arial", 8), bg="#000000", fg="white").grid(row=0, column=7, padx=5)
         
         # Upload method dropdown
         tk.Label(control_frame, text="Upload:", font=("Arial", 9)).grid(row=0, column=8, padx=(15, 5))
-        
-        # Store actual methods internally (can be multiple)
-        self.actual_upload_methods = tk.StringVar(value="local,cloudinary")  # Default: Local + Cloudinary
-        
-        upload_dropdown = ttk.Combobox(control_frame, textvariable=self.upload_method, 
-                                       values=["1 - Local Only", 
-                                               "2 - Cloudinary Only", 
-                                               "3 - Notion Blocks Only",
-                                               "1+2 - Local + Cloudinary",
-                                               "1+3 - Local + Notion Blocks",
-                                               "2+3 - Cloudinary + Notion Blocks",
-                                               "All - Local + Cloudinary + Notion"], 
-                                       width=22, state="readonly", font=("Arial", 9))
+        upload_dropdown = ttk.Combobox(control_frame, textvariable=self.upload_method, values=["local", "cloudinary", "notion_blocks"], width=12, state="readonly", font=("Arial", 9))
         upload_dropdown.grid(row=0, column=9, padx=5)
-        
-        # Map display values back to method names when saving
-        def on_upload_change(event):
-            display_value = self.upload_method.get()
-            method_map = {
-                "1 - Local Only": "local",
-                "2 - Cloudinary Only": "cloudinary",
-                "3 - Notion Blocks Only": "notion_blocks",
-                "1+2 - Local + Cloudinary": "local,cloudinary",
-                "1+3 - Local + Notion Blocks": "local,notion_blocks",
-                "2+3 - Cloudinary + Notion Blocks": "cloudinary,notion_blocks",
-                "All - Local + Cloudinary + Notion": "local,cloudinary,notion_blocks"
-            }
-            self.actual_upload_methods.set(method_map.get(display_value, "local,cloudinary"))
-        
-        upload_dropdown.bind("<<ComboboxSelected>>", on_upload_change)
-        
-        # Set initial display value
-        self.upload_method.set("1+2 - Local + Cloudinary")
-        self.actual_upload_methods.set("local,cloudinary")  # Initialize to Local + Cloudinary
-        
-        # Folder chooser button
-        tk.Button(control_frame, text="📁 Save Folder", command=self.choose_screenshot_folder, font=("Arial", 8), bg="#607D8B", fg="white").grid(row=0, column=10, padx=5)
         
         # Screenshot buttons
         screenshot_frame = tk.Frame(right_panel)
@@ -302,110 +244,20 @@ class TradingJournalFinal:
         self.status_label.config(state="disabled")
         self.status_label.pack(pady=5)
     
-    def clear_crop_region(self):
-        monitor = self.selected_monitor.get()
-        if monitor in self.screenshot_mgr.crop_regions:
-            del self.screenshot_mgr.crop_regions[monitor]
-            self.status_label.config(state="normal", fg="orange")
-            self.status_label.delete("1.0", "end")
-            self.status_label.insert("1.0", f"✓ Crop region cleared for Monitor {monitor}")
-            self.status_label.config(state="disabled")
-        else:
-            self.status_label.config(state="normal", fg="red")
-            self.status_label.delete("1.0", "end")
-            self.status_label.insert("1.0", f"No crop region defined for Monitor {monitor}")
-            self.status_label.config(state="disabled")
-    
     def define_crop_region(self):
-        try:
-            # Create transparent overlay window spanning ALL monitors
-            crop_window = tk.Toplevel(self.root)
-            crop_window.withdraw()  # Hide initially
-            crop_window.attributes('-topmost', True)
-            crop_window.attributes('-alpha', 0.2)  # Lighter/more transparent
-            crop_window.config(bg='black')
-            crop_window.overrideredirect(True)  # Remove window decorations
-            
-            # Get total screen dimensions across all monitors
-            import ctypes
-            user32 = ctypes.windll.user32
-            total_width = user32.GetSystemMetrics(78)  # SM_CXVIRTUALSCREEN
-            total_height = user32.GetSystemMetrics(79)  # SM_CYVIRTUALSCREEN
-            left = user32.GetSystemMetrics(76)  # SM_XVIRTUALSCREEN
-            top = user32.GetSystemMetrics(77)  # SM_YVIRTUALSCREEN
-            
-            # Position window to cover all monitors
-            crop_window.geometry(f"{total_width}x{total_height}+{left}+{top}")
-            
-            canvas = tk.Canvas(crop_window, cursor="cross", bg='black', highlightthickness=0)
-            canvas.pack(fill="both", expand=True)
-            
-            crop_window.deiconify()  # Show window
-            
-            rect = {'x1': 0, 'y1': 0, 'x2': 0, 'y2': 0, 'id': None}
-            
-            def on_press(event):
-                rect['x1'], rect['y1'] = event.x, event.y
-                if rect['id']:
-                    canvas.delete(rect['id'])
-                rect['id'] = canvas.create_rectangle(event.x, event.y, event.x, event.y, outline='red', width=3)
-            
-            def on_drag(event):
-                if rect['id']:
-                    canvas.coords(rect['id'], rect['x1'], rect['y1'], event.x, event.y)
-            
-            def on_release(event):
-                rect['x2'], rect['y2'] = event.x, event.y
-                x1, y1, x2, y2 = min(rect['x1'], rect['x2']), min(rect['y1'], rect['y2']), max(rect['x1'], rect['x2']), max(rect['y1'], rect['y2'])
-                
-                # Convert canvas coordinates to absolute screen coordinates
-                abs_x1 = x1 + left
-                abs_y1 = y1 + top
-                abs_x2 = x2 + left
-                abs_y2 = y2 + top
-                
-                # Auto-detect which monitor this region is on
-                center_x = (abs_x1 + abs_x2) / 2
-                center_y = (abs_y1 + abs_y2) / 2
-                
-                monitors = self.screenshot_mgr.sct.monitors[1:]  # Skip monitor 0 (all monitors)
-                detected_monitor = None
-                for i, mon in enumerate(monitors, start=1):
-                    if (mon["left"] <= center_x < mon["left"] + mon["width"] and
-                        mon["top"] <= center_y < mon["top"] + mon["height"]):
-                        detected_monitor = i
-                        break
-                
-                if detected_monitor:
-                    # Auto-select the detected monitor
-                    self.selected_monitor.set(detected_monitor)
-                    
-                    # Save the crop region
-                    self.screenshot_mgr.set_crop_region(detected_monitor, abs_x1, abs_y1, abs_x2, abs_y2)
-                    crop_window.destroy()
-                    
-                    # Show success message
-                    self.status_label.config(state="normal", fg="green")
-                    self.status_label.delete("1.0", "end")
-                    self.status_label.insert("1.0", f"✓ Crop saved: {x2-x1}x{y2-y1}px | Monitor {detected_monitor} auto-selected")
-                    self.status_label.config(state="disabled")
-                else:
-                    crop_window.destroy()
-                    messagebox.showerror("Error", "Could not detect monitor. Draw region within a single monitor.")
-            
-            canvas.bind("<Button-1>", on_press)
-            canvas.bind("<B1-Motion>", on_drag)
-            canvas.bind("<ButtonRelease-1>", on_release)
-            crop_window.bind("<Escape>", lambda e: crop_window.destroy())
-            
-        except Exception as e:
-            messagebox.showerror("Error", f"Failed to define crop region: {str(e)}")
-    
-    def choose_screenshot_folder(self):
-        folder = filedialog.askdirectory(title="Choose Screenshot Save Folder", initialdir=self.screenshot_mgr.screenshot_folder)
-        if folder:
-            self.screenshot_mgr.screenshot_folder = folder
-            messagebox.showinfo("Folder Updated", f"Screenshots will be saved to:\n{folder}")
+        monitor = self.selected_monitor.get()
+        if monitor == 0:
+            messagebox.showinfo("Info", "Please select a specific monitor (1-4) to define crop region")
+            return
+        
+        messagebox.showinfo("Crop Region", "Click OK, then:\n1. Click top-left corner of chart\n2. Click bottom-right corner of chart")
+        
+        # Simple crop region capture (you'll need to implement click capture)
+        # For now, placeholder
+        self.status_label.config(state="normal", fg="blue")
+        self.status_label.delete("1.0", "end")
+        self.status_label.insert("1.0", f"Crop region feature - coming soon!")
+        self.status_label.config(state="disabled")
     
     def check_text_and_update_checklist(self, event=None):
         text = self.text_area.get("1.0", tk.END).strip().lower()
@@ -434,9 +286,7 @@ class TradingJournalFinal:
     
     def take_screenshot(self, stage):
         monitor = self.selected_monitor.get()
-        
-        # Auto-crop if region is defined for this monitor
-        use_crop = monitor in self.screenshot_mgr.crop_regions
+        use_crop = self.crop_mode.get()
         
         filepath = self.screenshot_mgr.capture(stage, monitor, use_crop)
         
@@ -452,8 +302,7 @@ class TradingJournalFinal:
         self.screenshot_status.config(text=f"✓ {', '.join(captured)}", fg="green")
         self.status_label.config(state="normal", fg="blue")
         self.status_label.delete("1.0", "end")
-        crop_info = f" (cropped)" if use_crop else ""
-        self.status_label.insert("1.0", f"Screenshot: {stage_names[stage]} - Monitor {monitor}{crop_info}")
+        self.status_label.insert("1.0", f"Screenshot: {stage_names[stage]}")
         self.status_label.config(state="disabled")
     
     def save_trade(self):
@@ -503,7 +352,7 @@ class TradingJournalFinal:
             
             # Build properties
             properties = {
-                "Name": {"title": [{"text": {"content": f"Trade - {datetime.now().strftime('%H:%M:%S')}"}}]},
+                "Name": {"title": [{"text": {"content": f"Trade - {datetime.now().strftime('%H:%M')}"}}]},
                 "Transcript": {"rich_text": [{"text": {"content": text}}]},
                 "Date": {"date": {"start": datetime.now().isoformat()}}
             }
@@ -512,16 +361,16 @@ class TradingJournalFinal:
                 properties["M5_Pattern"] = {"multi_select": [{"name": pattern} for pattern in data["M5_Pattern"]]}
             if "M1_Confirm" in data:
                 properties["M1_Confirm"] = {"select": {"name": data["M1_Confirm"]}}
-            if "Five_M_Form" in data:
-                properties["5m Form"] = {"select": {"name": data["Five_M_Form"]}}
+            if "M5_Form" in data:
+                properties["M5_Form"] = {"select": {"name": data["M5_Form"]}}
             
             if "Entry_Direction" in data:
                 properties["Entry_Direction"] = {"select": {"name": data["Entry_Direction"]}}
             if "Emotions" in data:
                 properties["Emotions"] = {"select": {"name": data["Emotions"]}}
-            if "Impulse" in data and data["Impulse"] is not None:
+            if "Impulse" in data:
                 properties["Impulse"] = {"number": int(data["Impulse"])}
-            if "Patience_Score" in data and data["Patience_Score"] is not None:
+            if "Patience_Score" in data:
                 properties["Patience_Score"] = {"number": int(data["Patience_Score"])}
             
             if "Summary" in data:
@@ -533,74 +382,11 @@ class TradingJournalFinal:
             # Create Notion page
             page = notion.pages.create(parent={"database_id": DATABASE_ID}, properties=properties)
             page_id = page['id']
-            page_url = page['url']
             
-            # Upload screenshots based on selected method(s)
+            # Upload screenshots based on selected method
             if screenshots:
-                upload_methods = self.actual_upload_methods.get().split(',')
-                print(f"DEBUG: Upload methods selected: {upload_methods}")
-                print(f"DEBUG: Screenshots to upload: {list(screenshots.keys())}")
-                
-                all_uploaded_urls = {}
-                
-                # Process each method
-                for method in upload_methods:
-                    method = method.strip()
-                    print(f"DEBUG: Processing method: {method}")
-                    
-                    uploaded_urls = add_screenshots_as_blocks(notion, page_id, screenshots, method)
-                    
-                    # Merge URLs from all methods (Cloudinary URLs take priority)
-                    if uploaded_urls:
-                        for stage_name, url in uploaded_urls.items():
-                            # Only add if not already present, or if this is a Cloudinary URL (http)
-                            if stage_name not in all_uploaded_urls or url.startswith("http"):
-                                all_uploaded_urls[stage_name] = url
-                
-                # If Cloudinary URLs or local paths were returned, update the Screenshots property with text links
-                if all_uploaded_urls:
-                    # Color mapping for stage names (matches button colors)
-                    stage_colors = {
-                        "Pre-Entry": "purple_background",
-                        "Entry": "green_background",
-                        "During": "orange_background",
-                        "Close": "red_background",
-                        "Post-Close": "gray_background"  # Black background with white text
-                    }
-                    
-                    # Create rich text with clickable colored links (e.g., "Entry | Close | Pre-Entry")
-                    links_text = []
-                    for stage_name, url in all_uploaded_urls.items():
-                        if links_text:
-                            links_text.append({"type": "text", "text": {"content": " | "}})
-                        
-                        # Add colored link with background
-                        color = stage_colors.get(stage_name, "default")
-                        
-                        # For Cloudinary URLs, make them clickable; for local paths, just show text
-                        if url.startswith("http"):
-                            links_text.append({
-                                "type": "text",
-                                "text": {"content": stage_name, "link": {"url": url}},
-                                "annotations": {"color": color}
-                            })
-                        else:
-                            # Local path - just colored text, no link
-                            links_text.append({
-                                "type": "text",
-                                "text": {"content": stage_name},
-                                "annotations": {"color": color}
-                            })
-                    
-                    # Update the page with the Screenshots property as rich text
-                    notion.pages.update(
-                        page_id=page_id,
-                        properties={"Screenshots": {"rich_text": links_text}}
-                    )
-                    print(f"Added {len(all_uploaded_urls)} screenshot links to Screenshots column")
-            
-            # Save to CSV with Media/Link column
-            self.save_to_csv(data, page_url, text)
+                upload_method = self.upload_method.get()
+                add_screenshots_as_blocks(notion, page_id, screenshots, upload_method)
             
             stats = get_stats()
             screenshot_count = len(screenshots)
@@ -638,33 +424,6 @@ class TradingJournalFinal:
         self.status_label.insert("1.0", f"ERROR: {error}")
         self.status_label.config(state="disabled")
         self.save_btn.config(state="normal")
-    
-    def save_to_csv(self, data, page_url, transcript):
-        """Save trade data to CSV with Media/Link column"""
-        csv_file = "trading_journal.csv"
-        file_exists = os.path.exists(csv_file)
-        
-        # Prepare row data
-        row = {
-            "Date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "M5_Pattern": ", ".join(data.get("M5_Pattern", [])) if isinstance(data.get("M5_Pattern"), list) else "",
-            "M1_Confirm": data.get("M1_Confirm", ""),
-            "5m_Form": data.get("Five_M_Form", ""),
-            "Entry_Direction": data.get("Entry_Direction", ""),
-            "Emotions": data.get("Emotions", ""),
-            "Impulse": data.get("Impulse", ""),
-            "Patience_Score": data.get("Patience_Score", ""),
-            "Summary": data.get("Summary", ""),
-            "Transcript": transcript,
-            "Media/Link": page_url
-        }
-        
-        # Write to CSV
-        with open(csv_file, 'a', newline='', encoding='utf-8') as f:
-            writer = csv.DictWriter(f, fieldnames=row.keys())
-            if not file_exists:
-                writer.writeheader()
-            writer.writerow(row)
 
 if __name__ == "__main__":
     root = tk.Tk()

@@ -1,0 +1,32 @@
+﻿# Cloudinary Setup Summary
+
+## Changes Made:
+
+### 1. Screenshot Storage Location
+- **Local screenshots** now save to: `%USERPROFILE%\Pictures\TRADING JOURNAL WITH VOICE`
+- This is typically: `C:\Users\YourName\Pictures\TRADING JOURNAL WITH VOICE`
+
+### 2. Cloudinary Folder Organization
+- All uploaded images now go to folder: **"TRADING JOURNAL WITH VOICE"**
+- This keeps your Cloudinary account organized
+
+### 3. Delete Script Created
+- File: `delete_cloudinary_images.py`
+- **WARNING**: This deletes ALL images in your Cloudinary account (76 found)
+- To use: Run `python delete_cloudinary_images.py` and type DELETE to confirm
+
+## How to Delete Cloudinary Images:
+
+1. Open terminal/command prompt
+2. Navigate to project folder
+3. Run: `python delete_cloudinary_images.py`
+4. Type `DELETE` (all caps) to confirm deletion
+5. Script will delete all 76 images and show progress
+
+## Upload Methods Available:
+
+1. **Local Only** - Saves to Pictures folder, no upload
+2. **Cloudinary** - Uploads to Cloudinary in "TRADING JOURNAL WITH VOICE" folder
+3. **Notion Blocks** - Saves locally + adds file paths to Notion
+
+All future Cloudinary uploads will be organized in the "TRADING JOURNAL WITH VOICE" folder.

@@ -1,0 +1,15 @@
+Debug Steps for Cloudinary Upload Issue
+
+1. Run the app
+2. Select '2 - Cloudinary' from dropdown
+3. Take a screenshot
+4. Save the trade
+5. Copy ALL console output and paste it
+
+Look for these debug messages:
+- DEBUG: Upload method selected: cloudinary
+- DEBUG: add_screenshots_as_blocks called with method=cloudinary
+- DEBUG: Cloudinary mode - getting credentials...
+
+If you see 'method=local' the dropdown isn't working.
+If you see 'credentials missing' check your .env file.
