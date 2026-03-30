@@ -5,13 +5,14 @@
 
 Starting application...
 
-Vocabulary training file loaded.
-DEBUG: Upload method selected: cloudinary
-DEBUG: Screenshots to upload: ['entry']
-DEBUG add_screenshots_as_blocks: upload_method='cloudinary', screenshots=['entry']
-DEBUG: Attempting Cloudinary upload for Entry
-DEBUG: Cloud name: dqrwqr6y2, API key exists: True, Secret exists: True
-DEBUG: Uploading ./screenshots\Trade_20260329_172050_entry_172050.png to Cloudinary...
-DEBUG: Upload result: https://res.cloudinary.com/dqrwqr6y2/image/upload/q_100/v1774801256/eldqwrzsfutv3j38oyjo.jpg
-Added 1 screenshots to Notion (method: cloudinary)
-Added 1 Cloudinary links to Screenshots column
+Traceback (most recent call last):
+  File "D:\MyPythonProjects_2\TRADING JOURNAL WITH VOICE\trading_journal_final.py", line 779, in <module>
+    app = TradingJournalFinal(root)
+  File "D:\MyPythonProjects_2\TRADING JOURNAL WITH VOICE\trading_journal_final.py", line 243, in __init__
+    tk.Button(control_frame, text="Define Crop", command=self.define_crop_region, font=("Arial", 9, "bold"), bg="#000000", fg="white", padx=10).grid(row=0, column=6, padx=10)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'TradingJournalFinal' object has no attribute 'define_crop_region'. Did you mean: 'clear_crop_region'?
+
+ERROR: Failed to start application
+
+Press any key to continue . . .

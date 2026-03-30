@@ -132,6 +132,10 @@ class TradingJournalFinal:
         self.upload_method = tk.StringVar(value=upload_map.get(upload_value, "local"))
         self.checklist_items = {}
         
+        # Track which stage button is in crop mode
+        self.crop_stage = None
+        self.stage_buttons = {}
+        
         # Main container
         main_frame = tk.Frame(root)
         main_frame.pack(fill="both", expand=True, padx=10, pady=10)
@@ -196,6 +200,16 @@ class TradingJournalFinal:
         )
         self.stats_label.pack()
         
+        # Vocabulary warning banner container (always exists, but may be empty)
+        self.warning_banner_container = tk.Frame(right_panel)
+        self.warning_banner_container.pack(fill="x", pady=(5, 0))
+        
+        # Initial check for unknown phrases
+        self.refresh_warning_banner()
+        
+        # Periodically check for updates (every 2 seconds)
+        self.check_warning_banner_updates()
+        
         # Monitor & Screenshot controls
         control_frame = tk.Frame(right_panel)
         control_frame.pack(pady=8)
@@ -206,8 +220,7 @@ class TradingJournalFinal:
             label = "All" if i == 0 else str(i)
             tk.Radiobutton(control_frame, text=label, variable=self.selected_monitor, value=i, font=("Arial", 9)).grid(row=0, column=i+1, padx=2)
         
-        # Define Crop button (auto-crops if region exists)
-        tk.Button(control_frame, text="Define Crop", command=self.define_crop_region, font=("Arial", 9, "bold"), bg="#000000", fg="white", padx=10).grid(row=0, column=6, padx=10)
+        # Define Crop button removed - now integrated into screenshot buttons
         
         # Clear Crop button
         tk.Button(control_frame, text="Clear Crop", command=self.clear_crop_region, font=("Arial", 8), bg="#666666", fg="white").grid(row=0, column=7, padx=5)
@@ -265,7 +278,7 @@ class TradingJournalFinal:
         ]
         
         for label, stage, color in stages:
-            tk.Button(
+            btn = tk.Button(
                 screenshot_frame,
                 text=label,
                 command=lambda s=stage: self.take_screenshot(s),
@@ -274,7 +287,9 @@ class TradingJournalFinal:
                 fg="white",
                 padx=8,
                 pady=4
-            ).pack(side="left", padx=3)
+            )
+            btn.pack(side="left", padx=3)
+            self.stage_buttons[stage] = {"button": btn, "original_color": color, "original_text": label}
         
         self.screenshot_status = tk.Label(screenshot_frame, text="", font=("Arial", 8), fg="#666")
         self.screenshot_status.pack(side="left", padx=10)
@@ -316,7 +331,8 @@ class TradingJournalFinal:
             self.status_label.insert("1.0", f"No crop region defined for Monitor {monitor}")
             self.status_label.config(state="disabled")
     
-    def define_crop_region(self):
+    def define_crop_region_and_capture(self, stage):
+        """Define crop region and automatically capture screenshot on release"""
         try:
             # Create transparent overlay window spanning ALL monitors
             crop_window = tk.Toplevel(self.root)
@@ -384,28 +400,88 @@ class TradingJournalFinal:
                     self.screenshot_mgr.set_crop_region(detected_monitor, abs_x1, abs_y1, abs_x2, abs_y2)
                     crop_window.destroy()
                     
-                    # Show success message
-                    self.status_label.config(state="normal", fg="green")
-                    self.status_label.delete("1.0", "end")
-                    self.status_label.insert("1.0", f"✓ Crop saved: {x2-x1}x{y2-y1}px | Monitor {detected_monitor} auto-selected")
-                    self.status_label.config(state="disabled")
+                    # Automatically capture screenshot with the crop
+                    self.capture_screenshot_with_crop(stage, detected_monitor)
                 else:
                     crop_window.destroy()
                     messagebox.showerror("Error", "Could not detect monitor. Draw region within a single monitor.")
+                    # Reset button appearance
+                    btn_info = self.stage_buttons[stage]
+                    btn_info["button"].config(
+                        bg=btn_info["original_color"],
+                        text=btn_info["original_text"]
+                    )
+                    self.crop_stage = None
             
             canvas.bind("<Button-1>", on_press)
             canvas.bind("<B1-Motion>", on_drag)
             canvas.bind("<ButtonRelease-1>", on_release)
-            crop_window.bind("<Escape>", lambda e: crop_window.destroy())
+            crop_window.bind("<Escape>", lambda e: (crop_window.destroy(), self.reset_crop_button(stage)))
             
         except Exception as e:
             messagebox.showerror("Error", f"Failed to define crop region: {str(e)}")
+            self.reset_crop_button(stage)
+    
+    def reset_crop_button(self, stage):
+        """Reset button appearance after crop is cancelled"""
+        if stage in self.stage_buttons:
+            btn_info = self.stage_buttons[stage]
+            btn_info["button"].config(
+                bg=btn_info["original_color"],
+                text=btn_info["original_text"]
+            )
+        self.crop_stage = None
+    
+    def capture_screenshot_with_crop(self, stage, monitor):
+        """Capture screenshot after crop region is defined"""
+        # Reset button appearance
+        btn_info = self.stage_buttons[stage]
+        btn_info["button"].config(
+            bg=btn_info["original_color"],
+            text=btn_info["original_text"]
+        )
+        self.crop_stage = None
+        
+        # Capture screenshot with crop
+        use_crop = monitor in self.screenshot_mgr.crop_regions
+        filepath = self.screenshot_mgr.capture(stage, monitor, use_crop)
+        
+        stage_names = {
+            "pre_entry": "Pre-Entry",
+            "entry": "Entry",
+            "during": "During",
+            "close": "Close",
+            "post_close": "Post-Close"
+        }
+        
+        captured = [stage_names[s] for s in self.screenshot_mgr.screenshots.keys()]
+        self.screenshot_status.config(text=f"✓ {', '.join(captured)}", fg="green")
+        self.status_label.config(state="normal", fg="blue")
+        self.status_label.delete("1.0", "end")
+        crop_info = f" (cropped)" if use_crop else ""
+        self.status_label.insert("1.0", f"Screenshot: {stage_names[stage]} - Monitor {monitor}{crop_info}")
+        self.status_label.config(state="disabled")
     
     def choose_screenshot_folder(self):
         folder = filedialog.askdirectory(title="Choose Screenshot Save Folder", initialdir=self.screenshot_mgr.screenshot_folder)
         if folder:
             self.screenshot_mgr.screenshot_folder = folder
             messagebox.showinfo("Folder Updated", f"Screenshots will be saved to:\n{folder}")
+    
+    def open_vocabulary_trainer(self):
+        """Open vocabulary trainer window to categorize unknown phrases"""
+        try:
+            import subprocess
+            import sys
+            # Try to run vocabulary_trainer.py if it exists
+            trainer_path = os.path.join(os.path.dirname(__file__), "vocabulary_trainer_ui.py")
+            if os.path.exists(trainer_path):
+                subprocess.Popen([sys.executable, trainer_path])
+            else:
+                messagebox.showinfo("Vocabulary Trainer", 
+                    "Vocabulary trainer UI not found.\nPlease manually edit vocabulary_training.json")
+        except Exception as e:
+            messagebox.showerror("Error", f"Could not open vocabulary trainer: {str(e)}")
     
     def check_text_and_update_checklist(self, event=None):
         text = self.text_area.get("1.0", tk.END).strip().lower()
@@ -433,27 +509,29 @@ class TradingJournalFinal:
             self.save_trade()
     
     def take_screenshot(self, stage):
-        monitor = self.selected_monitor.get()
+        # Reset any other button that was in crop mode
+        if self.crop_stage:
+            old_btn_info = self.stage_buttons[self.crop_stage]
+            old_btn_info["button"].config(
+                bg=old_btn_info["original_color"],
+                text=old_btn_info["original_text"]
+            )
         
-        # Auto-crop if region is defined for this monitor
-        use_crop = monitor in self.screenshot_mgr.crop_regions
+        # Set this button to crop mode
+        self.crop_stage = stage
+        btn_info = self.stage_buttons[stage]
+        btn_info["button"].config(
+            bg="#FF6B6B",
+            text=f"📐 {btn_info['original_text']}"
+        )
         
-        filepath = self.screenshot_mgr.capture(stage, monitor, use_crop)
+        # Open crop definition window with callback to capture screenshot
+        self.define_crop_region_and_capture(stage)
         
-        stage_names = {
-            "pre_entry": "Pre-Entry",
-            "entry": "Entry",
-            "during": "During",
-            "close": "Close",
-            "post_close": "Post-Close"
-        }
-        
-        captured = [stage_names[s] for s in self.screenshot_mgr.screenshots.keys()]
-        self.screenshot_status.config(text=f"✓ {', '.join(captured)}", fg="green")
-        self.status_label.config(state="normal", fg="blue")
+        # Update status
+        self.status_label.config(state="normal", fg="orange")
         self.status_label.delete("1.0", "end")
-        crop_info = f" (cropped)" if use_crop else ""
-        self.status_label.insert("1.0", f"Screenshot: {stage_names[stage]} - Monitor {monitor}{crop_info}")
+        self.status_label.insert("1.0", f"Draw crop region for {btn_info['original_text']} screenshot...")
         self.status_label.config(state="disabled")
     
     def save_trade(self):
@@ -665,6 +743,56 @@ class TradingJournalFinal:
             if not file_exists:
                 writer.writeheader()
             writer.writerow(row)
+    
+    def open_vocabulary_trainer(self):
+        """Open vocabulary trainer window"""
+        try:
+            import subprocess
+            import sys
+            # Launch vocabulary trainer in a separate process
+            subprocess.Popen([sys.executable, "vocabulary_trainer_ui.py"])
+        except Exception as e:
+            messagebox.showerror("Error", f"Could not open vocabulary trainer: {e}")
+    
+    def refresh_warning_banner(self):
+        """Refresh the warning banner based on current unknown phrases"""
+        # Clear existing content
+        for widget in self.warning_banner_container.winfo_children():
+            widget.destroy()
+        
+        try:
+            from vocabulary_trainer import has_unknown_phrases, get_unknown_phrases
+            if has_unknown_phrases():
+                unknown_count = len(get_unknown_phrases())
+                warning_frame = tk.Frame(self.warning_banner_container, bg="#FFF3CD", pady=8, relief="solid", bd=1)
+                warning_frame.pack(fill="x")
+                
+                warning_text = f"⚠️ {unknown_count} unknown phrase{'s' if unknown_count != 1 else ''} need{'s' if unknown_count == 1 else ''} categorization"
+                tk.Label(
+                    warning_frame,
+                    text=warning_text,
+                    font=("Arial", 10, "bold"),
+                    bg="#FFF3CD",
+                    fg="#856404"
+                ).pack(side="left", padx=10)
+                
+                tk.Button(
+                    warning_frame,
+                    text="Review Now",
+                    command=self.open_vocabulary_trainer,
+                    font=("Arial", 9),
+                    bg="#FFC107",
+                    fg="#000",
+                    padx=10
+                ).pack(side="right", padx=10)
+        except ImportError:
+            pass  # vocabulary_trainer not available
+    
+    def check_warning_banner_updates(self):
+        """Periodically check if warning banner needs updating"""
+        self.refresh_warning_banner()
+        # Check again in 2 seconds
+        self.root.after(2000, self.check_warning_banner_updates)
 
 if __name__ == "__main__":
     root = tk.Tk()

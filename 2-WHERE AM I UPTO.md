@@ -1,6 +1,6 @@
 # Where Am I Upto
 
-## Last Updated: 2026-03-29 18:20:00
+## Last Updated: 2026-03-30 12:51:00
 
 ---
 
@@ -77,6 +77,26 @@
 | Notion Token | ⏳ Waiting | Add to `.env` file |
 | Keyboard Shortcut | ⏳ Optional | Set up Right Ctrl hotkey |
 | Screenshot Feature | 🔜 Future | Add visual capture |
+
+---
+
+## Pending Tasks (From 4-THINGS TO DO.md)
+
+### High Priority:
+1. **Add Actual API Keys** - System is ready but has placeholder keys
+2. **Test End-to-End Flow** - Verify everything works together
+
+### Medium Priority:
+3. **Set Up Keyboard Shortcut** - Faster voice capture workflow
+4. **Refine Voice-to-Structure Dictionary** - Improve parsing accuracy
+5. **Add Screenshot Integration** - Capture visual context of trades
+
+### Low Priority:
+6. **Create Usage Dashboard** - Visual overview of trading patterns
+7. **Add Multiple Database Support** - Separate databases for strategies
+8. **Mobile Integration** - Capture trades from phone
+9. **Voice Command Shortcuts** - Hotword detection
+10. **Backup & Sync** - Prevent data loss
 
 ---
 
