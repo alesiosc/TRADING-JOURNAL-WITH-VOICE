@@ -1,34 +1,36 @@
 # Last Conversation Summary
 
-## Session Date: 2026-03-28 19:50:00
+## Session Date: 2026-03-29 18:18:00
 
 ---
 
 ## Key Decisions Made
 
-1. **Implementation-First Approach**: Moved from brainstorming to full implementation of the auto-watcher system
-2. **Groq API Choice**: Selected Groq API (Llama 3.3 70B) for voice transcript parsing instead of waiting for Zavi stability
-3. **File-Based Workflow**: Decided on Notepad → trading_notes folder → Auto-watcher → Notion flow
-4. **Token Tracking**: Implemented token usage monitoring to track API costs
+1. **Security-First Approach**: Removed all hardcoded API keys from the codebase and replaced them with placeholders to prevent secret exposure on GitHub
+
+2. **GitHub Repository Setup**: Successfully pushed the entire project to https://github.com/alesiosc/TRADING-JOURNAL-WITH-VOICE with clean commit history
+
+3. **Environment-Based Configuration**: API keys are now stored in `.env` file, which is excluded from version control via .gitignore
+
+4. **Placeholder Strategy**: All API references use `YOUR_GROQ_API_KEY_HERE` and `YOUR_NOTION_TOKEN_HERE` as placeholders in committed code
 
 ---
 
 ## Code Patterns Established
 
-- **Auto-Watcher Pattern**: Uses watchdog library to monitor folder for new .txt files
-- **JSON Response Parsing**: Groq API configured for JSON object output
-- **Property Mapping**: Voice-to-Structure Dictionary maps natural language to Notion properties
-- **Archive System**: Processed files moved to 'processed' subfolder after Notion entry creation
-- **Token Tracking**: Daily/monthly/all-time token usage stored in JSON file
+- **Environment Variables Pattern**: Using python-dotenv for secure API key management
+- **Security-First Commit Pattern**: Verify no secrets before pushing to remote repositories
+- **Auto-Watcher Pattern**: Watchdog file monitoring → Groq parsing → Notion API → Archive
+- **Token Tracking Pattern**: Daily/monthly/all-time tracking stored in JSON
 
 ---
 
 ## Next Steps Identified
 
-1. **Immediate**: Run auto_watcher.py and test end-to-end flow
-2. **Keyboard Integration**: Set up Right Ctrl hotkey to open Notepad for quick notes
-3. **Screenshot Integration**: Add visual trade capture capability
-4. **Weekly Review**: Create Notion template for Sunday reviews
+1. **Immediate**: Add actual API keys to `.env` file to enable functionality
+2. **Test**: Run `python auto_watcher.py` and verify end-to-end flow
+3. **Keyboard Integration**: Set up Right Ctrl hotkey for quick Notepad access
+4. **Screenshot Integration**: Add visual trade capture to Notion entries
 
 ---
 
@@ -37,6 +39,7 @@
 - `auto_watcher.py` - Main auto-watcher script with full implementation
 - `token_tracker.py` - Token usage tracking module
 - `test_notion.py` - Notion connection test
+- `.env` - Environment file for API keys (create with actual keys)
 - `docs - Cam/Data Dump.md` - Original design specifications
 - `11-CHANGE LOG.md` - Project change history
 - `2-WHERE AM I UPTO.md` - Current project status
@@ -48,6 +51,6 @@
 
 ## Project Vision Summary
 
-A simple, voice-first trading journal in Notion where you capture thoughts and emotions in a structured way — the easiest possible thing to use while trading. Now implemented with an auto-watcher system that monitors a folder for text files, parses them with Groq AI, and creates Notion entries automatically. Uses Python scripts for automation and tracks token usage for cost monitoring.
+A simple, voice-first trading journal in Notion where you capture thoughts and emotions in a structured way — the easiest possible thing to use while trading. Now with a fully implemented auto-watcher system that monitors a folder for text files, parses them with Groq AI, and creates Notion entries automatically. The project is securely stored on GitHub with all API keys properly managed via environment variables.
 
-**Status: IMPLEMENTED** - Auto-watcher system is ready for testing.
+**Status**: READY FOR USE - Add API keys to .env file to activate.

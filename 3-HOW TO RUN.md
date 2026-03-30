@@ -1,110 +1,172 @@
 # How To Run
 
-## Last Updated: 2026-03-28 19:50:00
-
-This document contains instructions for running and using the Trading Journal with Voice system.
+## Last Updated: 2026-03-29 18:21:00
 
 ---
 
-## Current Project Status
+## Quick Start (5 Steps)
 
-This project is a **trading journal system** that uses:
-- **Zavi** (zavivoice.com) - Voice assistant for hands-free data entry
-- **Notion** - Database for storing trading journal entries
-- **Custom Python Scripts** - Auto-watcher and automation tools
-- **Groq API** - AI processing for voice transcript parsing
-- **Custom M5/M1 Strategy** - Trading methodology being tracked
+### Step 1: Configure API Keys
+Edit the `.env` file in the project root:
+```env
+GROQ_API_KEY=your_actual_groq_api_key_here
+NOTION_TOKEN=your_actual_notion_token_here
+DATABASE_ID=33109f62-78d4-80f6-9da5-dad7b6591885
+```
 
----
+### Step 2: Start the Auto-Watcher
+```powershell
+python auto_watcher.py
+```
+Keep this running in a terminal window.
 
-## Running the System
+### Step 3: Capture Your Trade Thoughts
+Create a new text file in `trading_notes/` folder. You can:
+- Open Notepad with Right Ctrl hotkey
+- Type or dictate your thoughts
+- Save the file with any name
 
-### Option 1: Auto-Watcher (Recommended)
+### Step 4: Watch the Magic
+The auto-watcher will:
+1. Detect the new file
+2. Send it to Groq AI for parsing
+3. Create a new entry in your Notion trading journal
+4. Archive the processed file
 
-The auto-watcher monitors a folder and automatically processes voice transcripts to Notion.
-
-1. **Install Dependencies:**
-   ```powershell
-   pip install watchdog groq notion-client
-   ```
-
-2. **Run the Auto-Watcher:**
-   ```powershell
-   python auto_watcher.py
-   ```
-
-3. **Using the System:**
-   - Press Right Ctrl to open Notepad
-   - Dictate your trading thoughts
-   - Save the file as .txt in the `trading_notes` folder
-   - The auto-watcher will process it and create a Notion entry
-
-### Option 2: Zavi Setup (Voice Assistant)
-
-- Download Zavi from zavivoice.com
-- Configure Notion integration in Zavi app
-- Set up the Voice-to-Structure Dictionary in Zavi's agent settings
-
-### Notion Database Setup
-
-- Open Notion and navigate to database: `33109f62-78d4-80f6-9da5-dad7b6591885`
-- Database should have the following properties:
-  - **Strategy**: M5 Anchor, M1 Confirm, Level Type, Setup Quality
-  - **Mindset**: Internal State, Impulse Level, Patience Grade, Zavi Narrative
-  - **Outcome**: Discipline Score (formula)
+### Step 5: Check Your Notion
+Open your Notion database and verify the new entry was created with all your voice-captured properties.
 
 ---
 
-## Daily Workflow
+## Voice Transcript Format
 
-### With Auto-Watcher
-1. **Start**: Run `python auto_watcher.py` in terminal
-2. **During Trading**: Press Right Ctrl → Notepad opens → Type thoughts → Save to trading_notes/
-3. **Auto-Processing**: Script detects new file → Parses with Groq → Creates Notion entry
-4. **View**: Check Notion database for new entries
+Your text files should follow this pattern for best results:
 
-### Traditional Zavi Flow
-- **08:30 AM** - Pre-Market: Click "Start Session" button, use Zavi to dictate daily goals
-- **Trading Hours** - Use Zavi voice commands to log trades
-- **04:30 PM** - Post-Market: Voice to Zavi for reflection
+```
+[Trade Entry - 2026-03-29 18:00]
 
----
+mood: calm
+setup: breakout
+anchor: hammer
+level: blue level
+note: testing the system
+```
 
-## Voice Commands (for Zavi)
+### Supported Keywords
 
-Use these trigger phrases with Zavi:
+| Pattern | Maps To | Example |
+|---------|---------|---------|
+| `mood: [word]` | Internal_State | `mood: zen`, `mood: anxious` |
+| `setup: [word]` | M1_Confirm | `setup: breakout` (sets M1_Confirm: true) |
+| `anchor: [word]` | M5_Anchor | `anchor: hammer`, `anchor: engulfing` |
+| `level: [word]` | Level_Type | `level: blue level`, `level: red level` |
+| `note: [text]` | Notes | Free-form notes |
 
-- **Pre-Trade**: "Zavi, record to Zavi Narrative: [your thoughts]"
-- **During Trade**: "Zavi, add to Internal Narrative: [live updates]"
-- **Post-Trade**: "Zavi, set Patience Grade to [A/C/F]"
+### Quick Keywords (Single Words)
 
----
-
-## Important Notes
-
-- The project follows "Simple, voice-first, easiest to use" principle
-- Keep voice entries short and natural
-- Use the Discipline Score to track your trading discipline
-- Review weekly using the Spoken Weekly Brief feature
-
----
-
-## Token Usage Tracking
-
-The system tracks Groq API usage:
-- Check `token_usage.json` for detailed stats
-- Run `python -c "from token_tracker import get_usage_summary; print(get_usage_summary())"` for quick summary
+You can also use single words:
+- `hammer`, `shooting star`, `engulfing` → M5_Anchor
+- `blue`, `red`, `LIS`, `BKBrown` → Level_Type
+- `calm`, `zen`, `anxious`, `FOMO`, `revenge` → Internal_State
+- `breakout`, `confirmed` → M1_Confirm: true
 
 ---
 
-## Project Files
+## File System Layout
 
-| File | Purpose |
-|------|---------|
-| `auto_watcher.py` | Main auto-watcher script |
-| `token_tracker.py` | Token usage tracking |
-| `test_notion.py` | Notion connection test |
-| `docs - Cam/Data Dump.md` | Original design specifications |
-| `1-UPDATE - DO_NOT_CHANGE.md` | Update instructions |
-| `2-WHERE AM I UPTO.md` | Current project status |
-| `11-CHANGE LOG.md` | History of changes |
+```
+PROJECT_ROOT/
+├── auto_watcher.py          # Main script (run this)
+├── token_tracker.py         # Token usage tracking
+├── .env                     # API keys (NOT committed to Git)
+├── trading_notes/           # Drop your voice transcripts here
+│   ├── (your files...)
+│   └── processed/           # Archive of processed files
+├── screenshots/             # Trade screenshots
+├── docs - Cam/              # Design documentation
+└── _bmad/                   # Agent workflows
+
+```
+
+---
+
+## Running Modes
+
+### Development Mode (Verbose Logging)
+```powershell
+$env:DEBUG="true"
+python auto_watcher.py
+```
+
+### Production Mode (Silent)
+```powershell
+python auto_watcher.py > $null 2>&1
+```
+
+### Test Mode (Dry Run)
+```powershell
+$env:DRY_RUN="true"
+python auto_watcher.py
+```
+
+---
+
+## Troubleshooting
+
+### "API key not found"
+→ Edit `.env` file and add your actual API keys
+
+### "Notion database not found"
+→ Verify DATABASE_ID is correct in `.env`
+→ Check Notion database sharing settings
+
+### "No files processed"
+→ Make sure files are .txt format
+→ Check files are in `trading_notes/` folder (not subfolders)
+→ Verify auto_watcher.py is running
+
+### "Permission denied"
+→ Run PowerShell as Administrator
+→ Check file permissions on trading_notes/ folder
+
+---
+
+## Monitoring Token Usage
+
+Check how much you've used:
+```powershell
+python -c "from token_tracker import get_usage_summary; print(get_usage_summary())"
+```
+
+Token data is stored in `token_usage.json`:
+```json
+{
+  "daily": {"prompt": 1500, "completion": 300},
+  "monthly": {"prompt": 45000, "completion": 9000},
+  "all_time": {"prompt": 450000, "completion": 90000},
+  "last_reset": "2026-03-01"
+}
+```
+
+---
+
+## Keyboard Shortcut (Optional)
+
+To set up Right Ctrl + N for quick Notepad access:
+1. Open Windows Settings → Keyboard Shortcuts
+2. Create a new shortcut for Notepad
+3. Assign Right Ctrl + N
+
+---
+
+## Stopping the Watcher
+
+Press `Ctrl + C` in the terminal running auto_watcher.py
+
+---
+
+## GitHub Repository
+
+- **Remote**: https://github.com/alesiosc/TRADING-JOURNAL-WITH-VOICE
+- **Status**: Clean, no secrets exposed
+- **Last Updated**: 2026-03-29

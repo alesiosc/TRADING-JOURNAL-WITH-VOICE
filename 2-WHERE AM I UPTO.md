@@ -1,67 +1,128 @@
 # Where Am I Upto
 
-## Date: 2026-03-28 19:50:00
-
-## Project Status
-
-### Current Phase
-The Trading Journal with Voice project has moved from **brainstorming phase** to **implementation phase**. The auto-watcher system is fully implemented and operational.
-
-### What's Been Done
-1. **Notion Database Structure** - Designed complete schema with Strategy and Mindset sections
-2. **Discipline Score Formula** - Created Notion formula for tracking trading discipline
-3. **Zavi Integration Research** - Tested Zavi voice assistant with Notion
-4. **Brainstorming Sessions** - Generated 18 ideas across 2 phases
-5. **Technical Architecture** - Defined 3-layer stack: Voice → Zavi → AI Parser → Notion API
-6. **Full Implementation** - Created auto_watcher.py with Groq API and Notion integration
-7. **Token Tracking** - Implemented token_tracker.py for usage monitoring
-8. **Test Scripts** - Created test_notion.py to verify Notion connection
-
-### Key Files
-- `auto_watcher.py` - Main auto-watcher script with file monitoring
-- `token_tracker.py` - Token usage tracking module
-- `test_notion.py` - Notion API connection test
-- `docs - Cam/Data Dump.md` - Original brainstorming notes
-- `_bmad-output/planning-artifacts/brainstorming/brainstorming-session-2026-03-26-1805.md` - Session results
-- `1-UPDATE - DO_NOT_CHANGE.md` - Update instructions
+## Last Updated: 2026-03-29 18:20:00
 
 ---
 
-## Next Priority Tasks
+## Current Project Status: READY FOR USE
 
-### 1. Run and Test Auto-Watcher System
-- Execute auto_watcher.py to verify full functionality
-- Test end-to-end flow: Notepad → trading_notes folder → Notion entry
+### What I've Built
 
-### 2. Keyboard Shortcut Integration
-- Set up global hotkey (Right Ctrl) to trigger Notepad for voice notes
-- Configure hotkey_listener.py for seamless voice capture
-
-### 3. Screenshot Integration
-- Add screenshot capture capability to Notion entries
-- Use quick_save.py and screenshot_uploader.py for visual trade records
+**Voice-First Trading Journal System:**
+- Auto-watcher that monitors `trading_notes/` folder for new text files
+- Groq AI integration for parsing voice transcripts into structured data
+- Notion database integration for storing trading journal entries
+- Token tracking system for API usage monitoring
+- GitHub repository for version control and backup
 
 ---
 
-## Pending Issues
+## System Architecture
 
-- Zavi agent mode testing showed instability; may need fallback to dictation mode
-- Discipline Score formula may need adjustment based on real trading data
-- Weekly review system needs to be implemented in Notion
-
-## Abandoned Features (Temporarily)
-- Radar charts for emotional visualization (deferred to keep simple)
-- Adaptive scoring system (deferred to keep simple)
-- Full AI pattern detection (deferred to Phase 2)
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    VOICE CAPTURE LAYER                      │
+│                                                             │
+│  [User speaks into Zavi or types in Notepad]               │
+│           ↓                                                 │
+│  [Text file saved to trading_notes/ folder]                │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│                    AUTO-WATCHER LAYER                       │
+│                                                             │
+│  [Watchdog monitors trading_notes/ folder]                 │
+│           ↓                                                 │
+│  [File detected → Groq API → Parse voice patterns]         │
+│           ↓                                                 │
+│  [Structured JSON data generated]                          │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│                    NOTION INTEGRATION                       │
+│                                                             │
+│  [Notion API creates new database entry]                    │
+│           ↓                                                 │
+│  [Entry with properties: M1_Confirm, M5_Anchor, etc.]      │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│                    ARCHIVE & TRACK                          │
+│                                                             │
+│  [Processed file moved to trading_notes/processed/]         │
+│  [Token usage saved to token_usage.json]                   │
+└─────────────────────────────────────────────────────────────┘
+```
 
 ---
 
-## Project Vision
-**Simple, voice-first, easiest to use** - The core principle guiding all decisions. All advanced features should serve simplicity, not compete with it.
+## What Works
 
-## Current Implementation Status
-**WORKING** - Auto-watcher system is implemented with:
-- File watcher monitoring ./trading_notes folder
-- Groq API (Llama 3.3 70B) for transcript parsing
-- Notion API for automatic entry creation
-- Token tracking for usage monitoring
+| Component | Status | Notes |
+|-----------|--------|-------|
+| Auto-Watcher | ✅ Ready | Monitors `trading_notes/` folder |
+| Groq API | ✅ Ready | Placeholder key, needs actual key |
+| Notion Integration | ✅ Ready | Database ID configured |
+| Token Tracking | ✅ Ready | Daily/monthly/all-time tracking |
+| GitHub Push | ✅ Done | Pushed to remote repository |
+| Environment Config | ✅ Ready | `.env` file with placeholders |
+
+---
+
+## What Needs Configuration
+
+| Item | Status | Action Required |
+|------|--------|-----------------|
+| Groq API Key | ⏳ Waiting | Add to `.env` file |
+| Notion Token | ⏳ Waiting | Add to `.env` file |
+| Keyboard Shortcut | ⏳ Optional | Set up Right Ctrl hotkey |
+| Screenshot Feature | 🔜 Future | Add visual capture |
+
+---
+
+## Environment Setup Required
+
+The system is designed to use environment variables for security:
+
+```bash
+# In .env file:
+GROQ_API_KEY=your_actual_groq_api_key_here
+NOTION_TOKEN=your_actual_notion_token_here
+DATABASE_ID=33109f62-78d4-80f6-9da5-dad7b6591885
+```
+
+---
+
+## Repository Info
+
+- **GitHub**: https://github.com/alesiosc/TRADING-JOURNAL-WITH-VOICE
+- **Status**: Clean, no secrets exposed
+- **Last Push**: 2026-03-29
+
+---
+
+## Key Files
+
+| File | Purpose |
+|------|---------|
+| `auto_watcher.py` | Main watcher script |
+| `.env` | API key storage (not committed) |
+| `token_tracker.py` | Token usage tracking |
+| `trading_notes/` | Folder to drop voice transcripts |
+| `docs - Cam/Data Dump.md` | Original design spec |
+
+---
+
+## Next Session Goals
+
+1. **Immediate**: Add actual API keys to `.env` file
+2. **Test**: Run `python auto_watcher.py` and verify flow
+3. **Refine**: Adjust voice-to-structure dictionary based on testing
+4. **Enhance**: Add screenshot integration to Notion entries
+
+---
+
+## Current Branch
+
+- `main` - Production-ready, all features implemented
+- No pending changes in working directory

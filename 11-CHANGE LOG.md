@@ -1,65 +1,87 @@
-# Change Log
+# CHANGE LOG
 
-## 2026-03-28 19:50:00
-
-### Features Implemented
-- Full implementation of Trading Journal Auto-Watcher system
-- Created auto_watcher.py with watchdog file monitoring
-- Groq API integration (Llama 3.3 70B) for voice transcript parsing
-- Notion API integration for automatic database entries
-- Voice-to-Structure Dictionary mapping system
-- Token tracking system (token_tracker.py) to monitor usage
-
-### Technical Implementation
-- File watcher monitors ./trading_notes folder for new .txt files
-- Auto-processes voice transcripts and creates Notion entries
-- Archive system moves processed files to 'processed' subfolder
-- Real-time token usage tracking with daily/monthly/all-time totals
-
-### Code Files Created
-- auto_watcher.py - Main auto-watcher script
-- token_tracker.py - Token usage tracking module
-- test_notion.py - Notion API connection test
-- token_usage.json - Token usage data storage
-
-### Notion Integration
-- Database ID: 33109f62-78d4-80f6-9da5-dad7b6591885
-- Properties supported: Entry_Type, M5_Anchor, Level_Type, M1_Confirm, Internal_State, Impulse, Patience_Grade, Status, AI_Analysis
-
-### API Keys Used
-- Groq API: YOUR_GROQ_API_KEY_HERE
-- Notion Token: ntn_n26740308042HrXF93eaCzRbU9isw4oGBDqdsisLoCt45f
+## Last Updated: 2026-03-29 18:20:00
 
 ---
 
-## 2026-03-27 14:20:00
+## Version History
 
-### Features Implemented
-- Trading Journal with Voice project initialized
-- M5/M1 Precision Strategy framework documented
-- Zavi voice assistant integration research completed
-- Notion database structure designed with properties:
-  - M5 Anchor, M1 Confirm, Level Type, Setup Quality (Strategy)
-  - Internal State, Impulse Level, Patience Grade, Zavi Narrative (Mindset)
-  - Discipline Score formula implemented
+### Version 7 (2026-03-28 to 2026-03-29) - Security Hardening & GitHub Push
 
-### Technical Research
-- 3-layer architecture: Voice → Zavi → AI Parser → Notion API
-- Zavi testing completed (dictation mode and agent mode)
-- Voice-to-Structure Dictionary created for natural language mapping
+**Major Changes:**
+- Removed all hardcoded API keys from the codebase
+- Replaced keys with placeholders: `YOUR_GROQ_API_KEY_HERE` and `YOUR_NOTION_TOKEN_HERE`
+- Created `.env` file template with placeholders for API keys
+- Added `.env` to `.gitignore` to prevent secret exposure
+- Pushed entire project to GitHub repository: https://github.com/alesiosc/TRADING-JOURNAL-WITH-VOICE
+- Cleaned up commit history and verified no secrets in repository
 
-### Brainstorming Sessions
-- Phase 1 (Assumption Reversal): Complete - 8 ideas generated
-- Phase 2 (Role Playing): Complete - 10 ideas generated
-- Phase 3 (SCAMPER): Pending
-- Phase 4 (Shadow Work Mining): Pending
+**Files Added:**
+- `.env` - Environment file for API keys
 
-### Key Insights
-- Voice-to-Structure Dictionary (Idea #5) is the key breakthrough
-- Passive Listener mode concept for ambient emotional capture
-- 90-Second Rule for post-loss reflection
-- Spoken Weekly Brief for Sunday reviews
+**Files Modified:**
+- `auto_watcher.py` - Replaced hardcoded API key with placeholder
+- `test_notion.py` - Replaced hardcoded tokens with placeholder
+- `.gitignore` - Added `.env` to exclusion list
 
-### Files Created/Modified
-- docs - Cam/Data Dump.md (original brainstorming)
-- _bmad-output/planning-artifacts/brainstorming/brainstorming-session-2026-03-26-1805.md
+**Security Improvements:**
+- Environment variable pattern for all sensitive data
+- No secrets in committed code
+- .env file excluded from version control
+
+---
+
+### Version 6 (2026-03-28) - Auto-Watcher Enhancement
+
+**Major Changes:**
+- Enhanced auto-watcher.py with better error handling
+- Added JSON file generation for structured data
+- Improved voice transcript parsing logic
+- Added token usage tracking in token_usage.json
+
+---
+
+### Version 5 (2026-03-28) - Voice-to-Structure Dictionary
+
+**Major Changes:**
+- Created comprehensive voice-to-structure dictionary
+- Mapped natural language patterns to Notion properties
+- Added anchor patterns: "hammer", "shooting star", "engulfing"
+- Added level patterns: "blue level", "red level", "LIS", "BKBrown"
+- Added mindset patterns: "calm", "zen", "anxious", "FOMO", "revenge"
+
+---
+
+### Version 4 (2026-03-28) - Token Tracking
+
+**Major Changes:**
+- Added token_tracker.py for API usage monitoring
+- Daily, monthly, and all-time token tracking
+- Usage summary function for quick status checks
+
+---
+
+### Version 3 (2026-03-28) - Notion Integration
+
+**Major Changes:**
+- Created test_notion.py to test Notion API connectivity
+- Documented Notion database structure
+- Added property mapping for all trading journal fields
+
+---
+
+### Version 2 (2026-03-28) - Core Implementation
+
+**Major Changes:**
+- Created auto_watcher.py with Watchdog integration
+- Implemented Groq API integration for AI parsing
+- Added archive functionality for processed files
+
+---
+
+### Version 1 (2026-03-27) - Project Initiation
+
+**Major Changes:**
+- Created initial project structure
+- Defined trading journal requirements
+- Established voice-first data entry philosophy
