@@ -1,0 +1,3 @@
+@echo off
+echo Starting STT Module with GUI...
+pythonw stt_gui.py

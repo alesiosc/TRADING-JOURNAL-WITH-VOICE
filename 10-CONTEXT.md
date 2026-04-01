@@ -1,18 +1,48 @@
+Node.js helper functions loaded!
+ Python 3.13.3 PS D:\MyPythonProjects_2\TRADING JOURNAL WITH VOICE>  python stt_gui.py
+============================================================
+STT GUI - Starting...
+============================================================
+Detected 4 monitors
+  Monitor 1: Button at (50, 50)
+  Monitor 2: Button at (1987, -1150)
+  Monitor 3: Button at (67, -1150)
+  Monitor 4: Button at (1970, 50)
 
-========================================
-  Trading Journal Pro
-========================================
+Creating buttons...
 
-Starting application...
-
-Traceback (most recent call last):
-  File "D:\MyPythonProjects_2\TRADING JOURNAL WITH VOICE\trading_journal_final.py", line 779, in <module>
-    app = TradingJournalFinal(root)
-  File "D:\MyPythonProjects_2\TRADING JOURNAL WITH VOICE\trading_journal_final.py", line 243, in __init__
-    tk.Button(control_frame, text="Define Crop", command=self.define_crop_region, font=("Arial", 9, "bold"), bg="#000000", fg="white", padx=10).grid(row=0, column=6, padx=10)
-                                                         ^^^^^^^^^^^^^^^^^^^^^^^
-AttributeError: 'TradingJournalFinal' object has no attribute 'define_crop_region'. Did you mean: 'clear_crop_region'?
-
-ERROR: Failed to start application
-
-Press any key to continue . . .
+Buttons created!
+USAGE:
+1. Click into your target window (Notepad, browser, etc.)
+2. Click any MIC button to start recording
+3. Speak your message
+4. Click STOP button
+5. Text will type into your target window
+Right-click any button to exit
+============================================================
+Loading STT module...
+Loading Whisper model: base (device=cpu, compute_type=int8)
+✅ Whisper model loaded successfully
+⌨️  Hotkey listener started: <shift>+<tab>
+✅ STT Module started
+Ready! Click any button to record.
+Toggle: recording=False
+Will type into window: 342820750
+🎤 Recording started...
+Toggle: recording=True
+⏹️  Recording stopped.
+🔄 Transcribing...
+✅ Transcription: Hello, let's try this, does this work?
+⌨️  Typing text into focused window...
+✅ Typing complete
+Restored focus to window: 342820750
+Toggle: recording=False
+Will type into window: 342820750
+🎤 Recording started...
+Toggle: recording=True
+⏹️  Recording stopped.
+🔄 Transcribing...
+✅ Transcription: Hello, what about this, it's only better.
+⌨️  Typing text into focused window...
+✅ Typing complete
+Restored focus to window: 342820750

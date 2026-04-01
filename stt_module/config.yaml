@@ -1,0 +1,31 @@
+# STT Module Configuration
+
+# Provider selection: "faster_whisper" or "zavi_watcher"
+provider: faster_whisper
+
+# FasterWhisper settings (only used if provider = faster_whisper)
+faster_whisper:
+  model_size: base          # Options: tiny, base, small, medium, large
+  device: cpu               # Options: cpu, cuda
+  compute_type: int8        # Options: int8, int16, float16, float32
+  language: en              # Language code
+
+# Zavi Watcher settings (only used if provider = zavi_watcher)
+zavi_watcher:
+  output_file: ./zavi_output.txt
+
+# Audio capture settings
+audio:
+  device_index: null        # null = default mic, or specify device number
+  sample_rate: 16000        # 16kHz is standard for Whisper
+  channels: 1               # Mono
+
+# Hotkey settings
+hotkey:
+  enabled: true
+  key: <shift>+<tab>        # Hotkey to toggle recording
+
+# Auto-type settings (type into focused window after transcription)
+auto_type:
+  enabled: true             # Set to true to automatically type transcribed text
+  typing_speed: 0.01        # Delay between keystrokes in seconds (0.01 = fast, 0.05 = slower)
