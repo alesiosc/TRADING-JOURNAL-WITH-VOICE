@@ -4,10 +4,10 @@ Trading Journal With Voice — Unified Broker Connector Interface
 All broker connectors inherit from BaseBrokerConnector and implement:
 - fetch_trades(start_date, end_date) -> list[dict]
 - fetch_positions() -> list[dict]
-- get_account_summary() -> dict
+- get_account_summary() -> list[dict]
 
 Usage:
-    from brokers.base import get_connector
+    from brokers import get_connector
     alpaca = get_connector("alpaca")
     trades = alpaca.fetch_trades()
 """
@@ -84,6 +84,25 @@ def list_connectors() -> list[str]:
     """List all registered connector names."""
     return list(_registry.keys())
 
+
+# ---------------------------------------------------------------------------
+# Auto-import all known connectors so their register_connector() calls run
+# ---------------------------------------------------------------------------
+def _import_connectors():
+    connector_modules = [
+        "alpaca_connector",
+        "ibkr_connector",
+        "ctrader_connector",
+        "schwab_connector",
+    ]
+    for mod_name in connector_modules:
+        try:
+            __import__(f"brokers.{mod_name}")
+        except ImportError as e:
+            logger.debug("Could not import %s: %s", mod_name, e)
+
+
+_import_connectors()
 
 # ---------------------------------------------------------------------------
 # Canonical trade schema

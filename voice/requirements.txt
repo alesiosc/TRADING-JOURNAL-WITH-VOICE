@@ -1,0 +1,24 @@
+# Voice Module — Dependencies
+# Install with: pip install -r voice/requirements.txt
+
+# --- Core transcription ---
+# whisper.cpp CLI (separate install, not pip):
+#   https://github.com/ggerganov/whisper.cpp
+# Python fallback (faster-whisper):
+faster-whisper>=1.0.0
+
+# --- Vosk offline speech-to-text ---
+# Download model: https://alphacephei.com/vosk/models
+vosk>=0.3.45
+
+# --- Audio recording ---
+# pyaudio (platform-dependent):
+#   Windows: pip install pyaudio  (or pipwin install pyaudio)
+#   Linux:   sudo apt install portaudio19-dev python3-pyaudio
+#   macOS:   brew install portaudio && pip install pyaudio
+
+# --- Hotkey listening ---
+keyboard>=0.13.5
+
+# --- Trade parsing ---
+# (standard library: re, no extra deps)

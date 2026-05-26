@@ -186,3 +186,59 @@ export function createDailySummary(date) {
 export function fetchHealth() {
   return request('/health');
 }
+
+// ---- Voice Trade ----
+
+export function parseVoiceText(text) {
+  return request('/voice/parse', {
+    method: 'POST',
+    body: JSON.stringify({ text }),
+  });
+}
+
+export function executeVoiceTrade(text) {
+  return request('/voice/trade', {
+    method: 'POST',
+    body: JSON.stringify({ text }),
+  });
+}
+
+// ---- Active Trade ----
+
+export function fetchActiveTrade() {
+  return request('/trades/active/');
+}
+
+export function setActiveTrade(tradeId) {
+  return request(`/trades/active/${tradeId}/`, {
+    method: 'PUT',
+  });
+}
+
+export function clearActiveTrade() {
+  return request('/trades/active/', {
+    method: 'DELETE',
+  });
+}
+
+// ---- Brokers ----
+
+export function fetchBrokers() {
+  return request('/brokers/');
+}
+
+export function fetchBrokerStatus(name) {
+  return request(`/brokers/${encodeURIComponent(name)}/status`);
+}
+
+export function syncBroker(name, days = 30) {
+  return request(`/brokers/${encodeURIComponent(name)}/sync?days=${days}`, {
+    method: 'POST',
+  });
+}
+
+export function syncAllBrokers(days = 30) {
+  return request(`/brokers/sync-all?days=${days}`, {
+    method: 'POST',
+  });
+}

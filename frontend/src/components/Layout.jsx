@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { LayoutDashboard, ClipboardList, Upload, Menu, X } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, Upload, Server, Menu, X } from 'lucide-react';
+import VoiceTradeButton from './VoiceTradeButton';
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/trades', label: 'Trades', icon: ClipboardList },
   { to: '/import', label: 'Import', icon: Upload },
+  { to: '/brokers', label: 'Brokers', icon: Server },
 ];
 
 export default function Layout() {
@@ -79,6 +81,9 @@ export default function Layout() {
           <Outlet />
         </main>
       </div>
+
+      {/* Floating voice trade button */}
+      <VoiceTradeButton />
     </div>
   );
 }

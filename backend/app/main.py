@@ -1,13 +1,19 @@
 import os
+import sys
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
+# Ensure project root is on sys.path for brokers/ and other top-level packages
+_project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _project_root not in sys.path:
+    sys.path.insert(0, _project_root)
+
 from app.config import settings
 from app.database import engine, Base
-from app.routers import trades, journal, screenshots, stats, import_csv, instruments, ai, analytics
+from app.routers import trades, journal, screenshots, stats, import_csv, instruments, ai, analytics, voice, active_trade, broker_sync
 from app.services.websocket_manager import manager
 
 
@@ -84,6 +90,9 @@ app.include_router(import_csv.router)
 app.include_router(instruments.router)
 app.include_router(ai.router)
 app.include_router(analytics.router)
+app.include_router(broker_sync.router)
+app.include_router(voice.router)
+app.include_router(active_trade.router)
 
 
 # ---------------------------------------------------------------------------
