@@ -1,0 +1,40 @@
+# Broker CSV Auto-Watcher Configuration
+# All paths and settings are user-configurable.
+# ---------------------------------------------------------------------------
+# Master switch
+enabled: true
+
+# Directories to monitor for broker trade-export CSV files.
+# Supports glob patterns (e.g. MetaQuotes terminal wildcards).
+watch_dirs:
+  - "C:/Users/Cameron/Documents/NinjaTrader 8/"
+  - "C:/Users/Cameron/Documents/Trading/Exports/"
+  - "C:/Users/Cameron/AppData/Roaming/MetaQuotes/Terminal/*/MQL4/Files/"
+
+# How often to scan the watch directories (seconds)
+poll_interval_seconds: 30
+
+# Glob-style pattern for matching files
+pattern: "*.csv"
+
+# Auto-import: when true, found CSVs are uploaded to the backend
+auto_import: true
+
+# When true, preview the import only (no DB writes).
+# Set to false to import immediately.
+dry_run_first: true
+
+# Move imported files to an `_imported/` subfolder after processing
+move_imported: true
+
+# ---------------------------------------------------------------------------
+# Backend API connection
+api_base_url: "http://localhost:8000"
+api_import_endpoint: "/api/import/csv"
+
+# CSV encoding (default: utf-8-sig to handle BOM)
+encoding: "utf-8-sig"
+
+# ---------------------------------------------------------------------------
+# Logging
+log_file: "broker_watcher.log"

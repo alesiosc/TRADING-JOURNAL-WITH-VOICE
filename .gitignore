@@ -1,13 +1,58 @@
-﻿# API Keys and Secrets
+# API Keys and Secrets
 .env
 
 # Python
 __pycache__/
 *.pyc
+*.pyo
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
 
-# Screenshots and data
+# Database
+*.db
+*.sqlite
+*.sqlite3
+analytics/*.duckdb
+analytics/*.wal
+
+# Media and captures
 screenshots/
+voice_recordings/
+uploads/
+
+# Trading data
 trading_notes/
 api_tracker.json
 token_usage.json
 vocabulary_training.json
+
+# Logs
+*.log
+logs/
+
+# Node
+node_modules/
+frontend/node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Exports (generated)
+exports/*.csv
+exports/*.json
+exports/*.parquet
+
+# Config token files
+config/schwab_token.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

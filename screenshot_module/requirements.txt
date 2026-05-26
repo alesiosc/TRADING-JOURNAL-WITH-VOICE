@@ -1,0 +1,21 @@
+# Screenshot Module — Dependencies
+# Install with: pip install -r screenshot_module/requirements.txt
+
+# --- Screen capture ---
+mss>=9.0.0
+
+# --- Image processing & annotation ---
+Pillow>=10.0.0
+
+# --- OCR — at least one of these ---
+# PaddleOCR (preferred — local, no system deps):
+#   pip install paddleocr
+# pytesseract (fallback — requires system Tesseract-OCR install):
+#   https://github.com/tesseract-ocr/tesseract
+#   pip install pytesseract
+
+# --- Hotkey listening ---
+keyboard>=0.13.5
+
+# --- Region selector ---
+# tkinter (included with Python on most platforms)

@@ -1,19 +1,49 @@
 # Where Am I Upto
 
-## Last Updated: 2026-03-30 12:51:00
+## Last Updated: 2026-05-25
 
 ---
 
-## Current Project Status: READY FOR USE
+## Current Project Status: V2 BUILD — 5 NEW FEATURES ADDED
 
 ### What I've Built
 
-**Voice-First Trading Journal System:**
-- Auto-watcher that monitors `trading_notes/` folder for new text files
-- Groq AI integration for parsing voice transcripts into structured data
-- Notion database integration for storing trading journal entries
-- Token tracking system for API usage monitoring
-- GitHub repository for version control and backup
+**Complete Trading Journal v2 (FastAPI + React + SQLite):**
+- Backend: trades CRUD, instruments, journal entries, screenshots, stats engine, CSV import, WebSocket
+- Frontend: Dashboard, Trades list, TradeDetail, CSV Import, trade form modal
+- All frontend-backend data mismatches fixed
+
+**New Features (May 25):**
+
+1. **Screenshot Capture Module** (`screenshot_module/`)
+   - Global hotkey (configurable: default Ctrl+Shift+S)
+   - Captures active monitor or user-chosen specific monitor
+   - Auto-capture on trade events (entry/exit/SL move/add)
+   - Manual trigger via hotkey or API
+   - All settings user-definable in config.yaml
+
+2. **Broker CSV Auto-Watcher** (`broker_watcher/`)
+   - Monitors configurable directories for new CSV exports
+   - Auto-detects NT8, MT4/5, Quantower formats
+   - Auto-imports via existing import pipeline
+   - Persistent file tracking (won't re-import old files)
+
+3. **AI Trade Debrief** (optional, user-triggered)
+   - Uses local Ollama (qwen3.5:9b) to analyze closed trades
+   - Reviews entry/exit, risk management, emotional state
+   - Cached results, never automatic
+   - Frontend card on TradeDetail page
+
+4. **CSV Column Mapping Tool**
+   - Visual column mapper when CSV headers don't match
+   - Auto-detects field mapping from aliases
+   - Dropdown selector per field
+
+5. **Screenshot Replay / Flipbook**
+   - Manual click-through + auto-play slideshow
+   - Speed control (0.5x, 1x, 2x, 3x)
+   - Filmstrip thumbnails
+   - Keyboard navigation
 
 ---
 

@@ -1,0 +1,51 @@
+# Screenshot Module Configuration
+# All settings are user-definable — change anything here without touching code.
+
+# =============================================================================
+# Master toggle
+# =============================================================================
+enabled: true               # Set false to completely disable the screenshot module
+
+# =============================================================================
+# Hotkey settings
+# =============================================================================
+hotkey:
+  enabled: true
+  key: "<ctrl>+<shift>+s"   # Global hotkey combo. Examples:
+                              #   <ctrl>+<shift>+s
+                              #   <ctrl>+<shift>+<alt>+s
+                              #   <ctrl>+<print_screen>
+                              #   <scroll_lock>
+                              #   <f9>
+                              #   <ctrl>+<f9>
+                              # Uses pynput format: <ctrl>, <shift>, <alt>, <cmd> for modifiers
+                              # and standard key names for regular keys.
+
+# =============================================================================
+# Capture mode
+# =============================================================================
+capture_mode: "active_monitor"
+  # Options:
+  #   "active_monitor"   — automatically detects and captures the monitor
+  #                        that contains the currently focused/foreground window
+  #   "monitor_1"        — always capture monitor #1 (primary display)
+  #   "monitor_2"        — always capture monitor #2 (secondary display)
+  #   "monitor_3"        — always capture monitor #3
+  #   "all"              — capture a single combined screenshot of all monitors
+
+# =============================================================================
+# Output / storage
+# =============================================================================
+output_dir: "backend/uploads/screenshots"
+  # Path where screenshots are saved.
+  # Can be relative to project root or an absolute path.
+  # The existing backend serves /uploads/ as static files, so saving into
+  # backend/uploads/screenshots/ makes them immediately accessible via URL.
+
+# =============================================================================
+# Auto-capture on trade events
+# =============================================================================
+auto_capture_on_events: true
+  # When true, the module can automatically capture screenshots for trade
+  # events: entry, exit, sl_move, add, modification.
+  # Controlled via the /api/screenshots/auto-capture/{trade_id} endpoint.
