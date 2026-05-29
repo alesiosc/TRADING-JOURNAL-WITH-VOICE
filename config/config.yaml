@@ -1,8 +1,6 @@
 # =============================================================================
-# Trading Journal With Voice — Master Configuration
+# Trading Journal — Core Configuration
 # =============================================================================
-# Edit this file to configure your journal. All paths can be absolute or
-# relative to the project root (D:\MyPythonProjects_2\Trading Journal With Voice).
 
 # ---------------------------------------------------------------------------
 # Backend (FastAPI)
@@ -12,7 +10,7 @@ backend:
   port: 8000
   database_url: "sqlite:///./trading_journal.db"
   cors_origins: "http://localhost:5173,http://localhost:3000,http://localhost:8000"
-  reload: true  # auto-reload on code changes (dev only)
+  reload: true
 
 # ---------------------------------------------------------------------------
 # Frontend (React / Vite dev server)
@@ -20,178 +18,33 @@ backend:
 frontend:
   enabled: true
   dev_port: 5173
-  dist_dir: "frontend/dist"  # built static files
-
-# ---------------------------------------------------------------------------
-# Voice Input (Whisper.cpp)
-# ---------------------------------------------------------------------------
-voice:
-  enabled: true
-  engine: "whisper_cpp"  # whisper_cpp | vosk | browser_api
-  
-  # Whisper.cpp settings
-  whisper_cpp:
-    model: "tiny"  # tiny | base | small | medium | large
-    model_path: ""  # empty = auto-download in stt_module/
-    language: "en"
-    hotkey: "ctrl+shift+v"  # global hotkey to start recording
-    recording_dir: "voice_recordings"
-  
-  # Vosk settings (fallback for low-end hardware)
-  vosk:
-    model_path: ""
-    model_lang: "en-us"
-  
-  # Post-session transcription (not real-time per Kimi research)
-  # Use Whisper.cpp for post-session, Browser API for live dictation
-  mode: "post_session"  # post_session | realtime
 
 # ---------------------------------------------------------------------------
 # Screenshot Capture
 # ---------------------------------------------------------------------------
 screenshots:
   enabled: true
-  engine: "mss"  # mss | dxcam
-  
-  # Capture hotkeys
-  capture_hotkey: "ctrl+shift+s"     # manual capture
-  region_hotkey: "ctrl+shift+r"      # region capture
-  auto_capture: true                  # capture on trade entry/exit
-  
-  # Storage
+  engine: "mss"
+  capture_hotkey: "ctrl+shift+s"
+  region_hotkey: "ctrl+shift+r"
+  auto_capture: true
   save_dir: "screenshots"
-  format: "png"  # png | jpg
+  format: "png"
   quality: 95
-  
-  # OCR for extracting data from screenshots
-  ocr:
-    enabled: false  # requires PaddleOCR or Tesseract
-    engine: "paddleocr"  # paddleocr | tesseract | surya | ollama_vision
 
 # ---------------------------------------------------------------------------
-# Local AI (Ollama)
-# ---------------------------------------------------------------------------
-ai:
-  enabled: true
-  provider: "ollama"
-  
-  ollama:
-    url: "http://localhost:11434"
-    analysis_model: "qwen3:8b"      # or gemma3:4b for low-resource
-    vision_model: "llava:7b"        # for screenshot analysis
-    embedding_model: "nomic-embed-text"
-    
-    # Trade debrief settings
-    trade_debrief:
-      enabled: true
-      temperature: 0.3
-      max_tokens: 2000
-    
-    # Auto-tagging
-    auto_tag:
-      enabled: true
-    
-    # Daily summary
-    daily_summary:
-      enabled: true
-  
-  # Alternative: Gemini API free tier (60 req/min)
-  gemini:
-    enabled: false
-    api_key: ""  # set in .env
-
-# ---------------------------------------------------------------------------
-# Broker Connectors
-# ---------------------------------------------------------------------------
-brokers:
-  # --- Alpaca (free stocks/crypto API) ---
-  alpaca:
-    enabled: false
-    api_key: ""       # set in .env
-    secret_key: ""    # set in .env
-    paper: true       # use paper trading first
-    base_url: "https://paper-api.alpaca.markets"  # paper | live
-  
-  # --- Interactive Brokers (ib_insync) ---
-  ibkr:
-    enabled: false
-    host: "127.0.0.1"
-    port: 7497  # TWS: 7497 (paper) / 7496 (live); IB Gateway: 4001/4002
-    client_id: 1
-  
-  # --- cTrader (free forex API) ---
-  ctrader:
-    enabled: false
-    client_id: ""     # OAuth Public Client ID from Spotware
-    client_secret: "" # set in .env
-    environment: "demo"  # demo | live
-  
-  # --- Charles Schwab (post-TDA migration) ---
-  schwab:
-    enabled: false
-    app_key: ""
-    app_secret: ""
-    callback_url: "https://127.0.0.1:8181"
-    token_file: "config/schwab_token.json"
-  
-  # --- CSV Import (works for all brokers) ---
-  csv:
-    watch_dirs:
-      - ""  # e.g. C:/Users/Cameron/AppData/Roaming/MetaQuotes/Terminal/*/MQL4/Files/
-    poll_interval: 30  # seconds
-    auto_import: true
-    move_imported: true
-
-# ---------------------------------------------------------------------------
-# Database & Analytics
+# Database
 # ---------------------------------------------------------------------------
 database:
-  # Primary: SQLite for CRUD (already used by backend)
   primary: "sqlite"
-  
-  # Analytics: DuckDB for fast aggregations
-  analytics:
-    enabled: true
-    db_path: "analytics/analytics.duckdb"
-    auto_sync: true  # sync trades from SQLite to DuckDB on startup
-  
-  # Export
   export:
     csv_dir: "exports/csv"
-    parquet_dir: "exports/parquet"
-    auto_export_daily: false
-
-# ---------------------------------------------------------------------------
-# Sync (optional)
-# ---------------------------------------------------------------------------
-sync:
-  enabled: false
-  method: "syncthing"  # syncthing | rclone | none
-  
-  syncthing:
-    api_key: ""
-    gui_address: "127.0.0.1:8384"
-    folder_id: ""
-  
-  rclone:
-    remote: "b2:trading-journal-backup"
-    config_file: ""
-
-# ---------------------------------------------------------------------------
-# Notifications
-# ---------------------------------------------------------------------------
-notifications:
-  enabled: false
-  method: "desktop"  # desktop | discord_webhook | none
-  
-  discord:
-    webhook_url: ""
 
 # ---------------------------------------------------------------------------
 # Logging
 # ---------------------------------------------------------------------------
 logging:
-  level: "INFO"  # DEBUG | INFO | WARNING | ERROR
+  level: "INFO"
   file: "journal.log"
   max_size_mb: 10
   backup_count: 3

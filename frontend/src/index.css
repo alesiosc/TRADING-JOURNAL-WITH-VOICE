@@ -2,53 +2,197 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
+/* ── GhostJournal Design System v2 ── */
 
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
 ::-webkit-scrollbar-track {
   background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #D1D5DB;
   border-radius: 3px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #9CA3AF;
 }
 
 body {
-  background-color: #f8f9fa;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #F8FAFC;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color: #0F172A;
 }
 
-/* Trade direction arrows */
-.direction-long {
-  color: #22c55e;
+/* ── Premium Ghost Card ── */
+.ghost-card {
+  @apply bg-white rounded-2xl border border-[#E9EDF2] p-6;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.ghost-card:hover {
+  border-color: #E2E6EC;
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.02);
 }
 
-.direction-short {
-  color: #ef4444;
+.ghost-card-header {
+  @apply flex items-center justify-between mb-5;
+}
+.ghost-card-title {
+  @apply text-sm font-semibold text-[#0F172A] flex items-center gap-2.5;
 }
 
-.pnl-positive {
-  color: #22c55e;
-  font-weight: 600;
+/* ── Pill Taxonomy v2 ── */
+.pill {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap;
+}
+.pill-blue    { @apply pill bg-[#EFF6FF] text-[#2563EB] border border-[#DBEAFE]; }
+.pill-gray    { @apply pill bg-[#F3F4F6] text-[#475569] border border-[#E9EDF2]; }
+.pill-green   { @apply pill bg-[#ECFDF5] text-[#059669] border border-[#D1FAE5]; }
+.pill-red     { @apply pill bg-[#FEF2F2] text-[#DC2626] border border-[#FECACA]; }
+.pill-orange  { @apply pill bg-[#FFF7ED] text-[#EA580C] border border-[#FED7AA]; }
+.pill-purple  { @apply pill bg-[#F5F3FF] text-[#7C3AED] border border-[#EDE9FE]; }
+.pill-outline { @apply pill bg-transparent border border-[#E9EDF2] text-[#475569] hover:border-[#D1D5DB]; }
+
+/* ── Status Dot ── */
+.status-dot { @apply inline-block w-1.5 h-1.5 rounded-full; }
+.status-dot-open   { @apply status-dot bg-[#F59E0B]; }
+.status-dot-closed { @apply status-dot bg-[#94A3B8]; }
+
+/* ── Direction / P&L ── */
+.pnl-positive { @apply text-[#059669] font-semibold; }
+.pnl-negative { @apply text-[#DC2626] font-semibold; }
+
+/* ── Soft Action Button ── */
+.btn-ghost {
+  @apply inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium transition-all duration-150;
+}
+.btn-ghost-primary {
+  @apply btn-ghost bg-[#EFF6FF] text-[#2563EB] hover:bg-blue-100 active:bg-blue-200;
+}
+.btn-ghost-secondary {
+  @apply btn-ghost bg-white text-[#475569] border border-[#E9EDF2] hover:bg-[#F8FAFC] hover:border-[#D1D5DB] active:bg-[#F1F5F9];
 }
 
-.pnl-negative {
-  color: #ef4444;
-  font-weight: 600;
+/* ── Primary Button ── */
+.btn-primary {
+  @apply inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium text-white transition-all duration-150;
+  background: linear-gradient(135deg, #2563EB, #3B82F6);
+  box-shadow: 0 1px 3px 0 rgba(37, 99, 235, 0.2);
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, #1D4ED8, #2563EB);
+  box-shadow: 0 4px 12px 0 rgba(37, 99, 235, 0.3);
+  transform: translateY(-1px);
+}
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px 0 rgba(37, 99, 235, 0.2);
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }
 
-/* Modal overlay */
+/* ── Premium Stat Card ── */
+.stat-card {
+  @apply bg-white rounded-2xl border border-[#E9EDF2] p-5 relative overflow-hidden;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s, border-color 0.2s, transform 0.2s;
+}
+.stat-card:hover {
+  border-color: #E2E6EC;
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.02);
+  transform: translateY(-2px);
+}
+.stat-label {
+  @apply text-[11px] font-semibold text-[#64748B] uppercase tracking-[0.06em];
+}
+.stat-value {
+  @apply text-2xl font-bold text-[#0F172A] mt-1.5 leading-tight;
+}
+.stat-icon {
+  @apply w-9 h-9 rounded-xl flex items-center justify-center;
+}
+
+/* ── Chart Container ── */
+.chart-container {
+  @apply bg-white rounded-2xl border border-[#E9EDF2] p-6;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+}
+
+/* ── Premium Table ── */
+.ghost-table {
+  @apply w-full border-collapse;
+}
+.ghost-table thead {
+  @apply border-b border-[#E9EDF2];
+}
+.ghost-table th {
+  @apply text-left text-[11px] font-semibold text-[#64748B] uppercase tracking-[0.06em] px-5 py-3.5 bg-transparent;
+}
+.ghost-table td {
+  @apply px-5 py-3.5 text-sm text-[#334155] border-b border-[#F1F5F9];
+}
+.ghost-table tbody tr {
+  @apply transition-colors duration-150;
+}
+.ghost-table tbody tr:hover td {
+  @apply bg-[#F8FAFC];
+}
+.ghost-table tbody tr:last-child td {
+  @apply border-b-0;
+}
+
+/* ── Input ── */
+.ghost-input {
+  @apply w-full px-3.5 py-2.5 border border-[#E2E6EC] rounded-xl text-sm text-[#0F172A] bg-white placeholder:text-[#94A3B8] transition-all duration-150;
+}
+.ghost-input:focus {
+  @apply border-[#3B82F6] outline-none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+.ghost-select {
+  @apply ghost-input appearance-none cursor-pointer;
+}
+
+/* ── Modal Overlay ── */
 .modal-overlay {
-  background-color: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(2px);
+  background-color: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-content {
+  animation: slideUp 0.2s ease-out;
+}
+
+/* ── Sidebar ── */
+.sidebar-link {
+  @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 relative;
+}
+.sidebar-link-active {
+  @apply bg-[#F1F5F9] text-[#0F172A] font-semibold;
+}
+.sidebar-link-active::before {
+  content: '';
+  @apply absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-full bg-[#3B82F6];
+}
+.sidebar-link-inactive {
+  @apply text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A];
 }

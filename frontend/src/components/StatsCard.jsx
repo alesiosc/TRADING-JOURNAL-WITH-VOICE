@@ -1,15 +1,11 @@
-export default function StatsCard({ label, value, prefix = '', suffix = '', positive, negative }) {
-  let colorClass = 'text-gray-900';
-  if (positive === true) colorClass = 'text-positive';
-  else if (positive === false) colorClass = 'text-negative';
-  else if (negative === true) colorClass = 'text-negative';
-  else if (negative === false) colorClass = 'text-positive';
+export default function StatsCard({ label, value, positive, negative }) {
+  const valueColor = positive ? 'text-[#22c55e]' : negative ? 'text-[#ef4444]' : 'text-[#111827]';
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 min-w-[140px] flex-1">
-      <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">{label}</p>
-      <p className={`text-2xl font-bold ${colorClass}`}>
-        {prefix}{value !== null && value !== undefined ? value : '—'}{suffix}
+    <div className="stat-card">
+      <p className="stat-label">{label}</p>
+      <p className={`stat-value ${value != null ? valueColor : ''}`}>
+        {value ?? '\u2014'}
       </p>
     </div>
   );

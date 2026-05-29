@@ -64,6 +64,17 @@ export function updateTrade(id, data) {
   });
 }
 
+export function closeTrade(id, exitPrice) {
+  return request(`/trades/${id}/`, {
+    method: 'PUT',
+    body: JSON.stringify({
+      status: 'closed',
+      exit_price: exitPrice,
+      exit_time: new Date().toISOString(),
+    }),
+  });
+}
+
 export function deleteTrade(id) {
   return request(`/trades/${id}/`, {
     method: 'DELETE',
@@ -125,7 +136,6 @@ export function fetchScreenshots(params = {}) {
 }
 
 export function createScreenshot(data) {
-  // data should be FormData with file + fields
   return request('/screenshots/', {
     method: 'POST',
     body: data,
@@ -162,83 +172,21 @@ export function findInstrumentBySymbol(symbol) {
   return request(`/instruments/by-symbol/${encodeURIComponent(symbol)}`);
 }
 
-// ---- AI (Debrief & Daily Summary) ----
-
-export function fetchAIDebrief(tradeId) {
-  return request(`/ai/debrief/${tradeId}`);
-}
-
-export function createAIDebrief(tradeId) {
-  return request(`/ai/debrief/${tradeId}`, {
-    method: 'POST',
-  });
-}
-
-export function createDailySummary(date) {
-  const qs = date ? `?date=${encodeURIComponent(date)}` : '';
-  return request(`/ai/daily-summary${qs}`, {
-    method: 'POST',
-  });
-}
-
 // ---- Health ----
 
 export function fetchHealth() {
   return request('/health');
 }
 
-// ---- Voice Trade ----
+// ---- NT8 ----
 
-export function parseVoiceText(text) {
-  return request('/voice/parse', {
+export function fetchNT8Status() {
+  return request('/nt8/status');
+}
+
+export function sendTestNT8Trade(data) {
+  return request('/nt8/trade', {
     method: 'POST',
-    body: JSON.stringify({ text }),
-  });
-}
-
-export function executeVoiceTrade(text) {
-  return request('/voice/trade', {
-    method: 'POST',
-    body: JSON.stringify({ text }),
-  });
-}
-
-// ---- Active Trade ----
-
-export function fetchActiveTrade() {
-  return request('/trades/active/');
-}
-
-export function setActiveTrade(tradeId) {
-  return request(`/trades/active/${tradeId}/`, {
-    method: 'PUT',
-  });
-}
-
-export function clearActiveTrade() {
-  return request('/trades/active/', {
-    method: 'DELETE',
-  });
-}
-
-// ---- Brokers ----
-
-export function fetchBrokers() {
-  return request('/brokers/');
-}
-
-export function fetchBrokerStatus(name) {
-  return request(`/brokers/${encodeURIComponent(name)}/status`);
-}
-
-export function syncBroker(name, days = 30) {
-  return request(`/brokers/${encodeURIComponent(name)}/sync?days=${days}`, {
-    method: 'POST',
-  });
-}
-
-export function syncAllBrokers(days = 30) {
-  return request(`/brokers/sync-all?days=${days}`, {
-    method: 'POST',
+    body: JSON.stringify(data),
   });
 }

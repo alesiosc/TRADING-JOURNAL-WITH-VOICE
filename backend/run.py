@@ -1,5 +1,5 @@
 """
-Trading Journal With Voice — Backend Server Entry Point.
+Trading Journal — Backend Server Entry Point.
 
 Starts the FastAPI server with uvicorn. Run from the backend/ directory:
 

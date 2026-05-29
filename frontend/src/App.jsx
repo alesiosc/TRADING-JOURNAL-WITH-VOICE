@@ -4,7 +4,7 @@ import Dashboard from './pages/Dashboard';
 import Trades from './pages/Trades';
 import TradeDetail from './pages/TradeDetail';
 import ImportCsv from './pages/ImportCsv';
-import Brokers from './pages/Brokers';
+import NT8 from './pages/NT8';
 
 export default function App() {
   return (
@@ -14,7 +14,7 @@ export default function App() {
         <Route path="/trades" element={<Trades />} />
         <Route path="/trades/:id" element={<TradeDetail />} />
         <Route path="/import" element={<ImportCsv />} />
-        <Route path="/brokers" element={<Brokers />} />
+        <Route path="/nt8" element={<NT8 />} />
       </Route>
     </Routes>
   );
